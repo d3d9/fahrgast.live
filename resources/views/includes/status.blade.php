@@ -6,6 +6,13 @@
 <div class="card status mb-3" id="status-{{ $status->id }}"
      data-trwl-id="{{$status->id}}"
      data-date="{{userTime($status->checkin->departure, __('dateformat.with-weekday'))}}"
+     data-trwl-linename="{{$status->checkin->trip->linename}}"
+     data-trwl-departure-planned="{{userTime($status->checkin->originStopover->departure_planned)}}"
+     data-trwl-arrival-planned="{{userTime($status->checkin->destinationStopover->arrival_planned)}}"
+     data-trwl-departure-real="{{userTime($status->checkin->originStopover->departure_real)}}"
+     data-trwl-arrival-real="{{userTime($status->checkin->destinationStopover->arrival_real)}}"
+     data-trwl-origin="{{$status->checkin->originStation->name}}"
+     data-trwl-destination="{{$status->checkin->destinationStation->name}}"
      @if(auth()->check() && auth()->id() === $status->user_id)
          data-trwl-status-body="{{ $status->body }}"
          data-trwl-manual-departure="{{ userTime($status->checkin?->manual_departure, 'Y-m-d\TH:i:s', false)}}"
@@ -15,6 +22,11 @@
          data-trwl-destination-stopover="{{$status->checkin->destinationStopover->id}}"
          data-trwl-alternative-destinations=
              "{{json_encode(StationController::getAlternativeDestinationsForCheckin($status->checkin))}}"
+         data-trwl-chain-id="{{ $status->travelChain?->id }}"
+         data-trwl-chain-label="{{ $status->travelChain?->title }}"
+         data-trwl-planned="{{ isset($status->planned) ? intval($status->planned) : null }}"
+         data-trwl-taken="{{ isset($status->taken) ? intval($status->taken) : null }}"
+         data-trwl-not-taken-reason="{{ $status->not_taken_reason?->value }}"
     @endif
 >
     @if (Route::current()->uri == "status/{id}")
@@ -29,13 +41,6 @@
     @endif
 
     <div class="card-body row">
-        <div class="col-2 image-box pe-0 d-none d-lg-flex">
-            <a href="{{ route('profile', ['username' => $status->user->username]) }}">
-                <img loading="lazy" decoding="async" src="{{ ProfilePictureController::getUrl($status->user) }}"
-                     alt="{{ $status->user->username }}">
-            </a>
-        </div>
-
         <div class="col ps-0">
             <ul class="timeline">
                 <li>
@@ -50,9 +55,12 @@
                             </small>
                             &nbsp;
                         @endisset
-                        <span data-mdb-toggle="tooltip" title="{{$display_departure->type->getTooltip()}}">
+                        <span data-mdb-toggle="tooltip" title="{{$display_departure->type->getTooltip()}}" @if($display_departure->cancelled) class="text-muted" @endif>
                             {{ userTime($display_departure->time) }}
                         </span>
+                        @if($display_departure->cancelled)
+                            <span class="text-danger">Ausfall</span>
+                        @endif
                     </span>
 
                     <a href="{{route('trains.stationboard', ['provider' => 'train', 'station' => $status->checkin->originStation->ibnr])}}"
@@ -60,7 +68,7 @@
                         {{$status->checkin->originStation->name}}
                     </a>
 
-                    <p class="train-status text-muted">
+                    <p class="train-status text-muted mb-1">
                         <span>
                             @if (file_exists(public_path('img/' . $status->checkin->trip->category->value . '.svg')))
                                 <img class="product-icon"
@@ -75,20 +83,27 @@
                                 <small>({{$status->checkin->trip->journey_number}})</small>
                             @endif
                         </span>
-                        <span class="ps-2">
-                            <i class="fa fa-route d-inline" aria-hidden="true"></i>
-                            @if($status->checkin->distance < 1000)
-                                {{ $status->checkin->distance }}<small>m</small>
-                            @else
-                                {{round($status->checkin->distance / 1000)}}<small>km</small>
-                            @endif
-                        </span>
-                        <span class="ps-2">
-                            <i class="fa fa-stopwatch d-inline" aria-hidden="true"></i>
-                            {!! durationToSpan(secondsToDuration($status->checkin->duration * 60)) !!}
+                        @if (Route::current()->uri == "status/{id}")
+                            <span class="ps-2">
+                                <i class="fa fa-route d-inline" aria-hidden="true"></i>
+                                @if($status->checkin->distance < 1000)
+                                    {{ $status->checkin->distance }}<small>m</small>
+                                @else
+                                    {{round($status->checkin->distance / 1000)}}<small>km</small>
+                                @endif
+                            </span>
+                            <span class="ps-2">
+                                <i class="fa fa-stopwatch d-inline" aria-hidden="true"></i>
+                                {!! durationToSpan(secondsToDuration($status->checkin->duration * 60)) !!}
+                            </span>
+                            <br/>
+                        @endif
+                        <span class="">
+                            <small>&rarr; {{ $status->checkin->trip->destinationStation->name }}</small>
                         </span>
 
                         @if($status->business !== Business::PRIVATE)
+                            <!--
                             <span class="pl-sm-2">
                                 <i class="fa {{$status->business->faIcon()}}"
                                    data-mdb-toggle="tooltip"
@@ -98,6 +113,7 @@
                                 </i>
                                 <span class="sr-only">{{$status->business->title()}}</span>
                             </span>
+                            -->
                         @endif
                         @if($status->event != null)
                             <br/>
@@ -110,9 +126,59 @@
                         @endif
                     </p>
 
+                    @php
+                        $canCheckin = $status->canCheckin();
+                    @endphp
+
+                    <p class="train-status text-muted">
+                        @if(!isset($status->travelChain))
+                            <span class="badge badge-danger">Ohne Reisekette</span>
+                        @elseif($status->planned)
+                            <span class="badge badge-info">Geplant</span>
+                        @elseif($status->planned === false)
+                            <span class="badge badge-warning">Ungeplant</span>
+                        @else
+                            <span class="badge badge-danger">???</span>
+                        @endif
+                        @if($status->taken)
+                            <span class="badge badge-success">Mitgefahren</span>
+                        @elseif($status->taken === false)
+                            <span class="badge badge-danger">Nicht mitgefahren</span>
+                            <br/><span>Grund: </span><span>{{ $status->not_taken_reason?->getReason() ?? 'nicht angegeben' }}</span>
+                        @elseif(!isset($status->travelChain))
+
+                        @elseif($canCheckin)
+                            <span class="badge badge-primary">Mitgefahren? &ndash; Angabe ausstehend</span>
+                        @else
+                            <span class="badge badge-light">Ausstehend</span>
+                        @endif
+                    </p>
+
+                    @if($canCheckin)
+                        <button class="btn btn-primary edit-taken mb-3" type="button"
+                                data-trwl-status-id="{{ $status->id }}">
+                            <i class="fas fa-train" aria-hidden="true"></i>&nbsp;
+                            {{ __('modals.statusTaken-title') }}
+                        </button>
+                    @endif
+
+                    @if($status->planned !== true && $status->taken === false)
+                        <button class="btn btn-danger delete mb-3" type="button"
+                                data-mdb-toggle="modal"
+                                data-mdb-target="#modal-status-delete"
+                                onclick="document.querySelector('#modal-status-delete input[name=\'statusId\']').value = '{{$status->id}}'; document.getElementById('delete-status-context').innerHTML = statusContextString(document.getElementById('status-{{ $status->id }}').dataset);">
+                            <i class="fas fa-trash" aria-hidden="true"></i>
+                            {{__('delete')}}
+                        </button>
+                    @endif
+
                     @if(!empty($status->body))
                         <p class="status-body"><i class="fas fa-quote-right" aria-hidden="true"></i>
                             {!! nl2br(e(preg_replace('~(\R{2})\R+~', '$1', $status->body))) !!}
+                        </p>
+                    @else
+                        <p class="status-body text-muted"><i class="fas fa-edit" aria-hidden="true"></i>
+                            <a href="#" class="edit" data-trwl-status-id="{{ $status->id }}"><em class="text-decoration-underline text-muted">{{__('status.no-notes-yet')}}</em></a>
                         </p>
                     @endif
 
@@ -140,9 +206,12 @@
                             </small>
                             &nbsp;
                         @endisset
-                        <span data-mdb-toggle="tooltip" title="{{$display_arrival->type->getTooltip()}}">
+                        <span data-mdb-toggle="tooltip" title="{{$display_arrival->type->getTooltip()}}" @if($display_arrival->cancelled) class="text-muted" @endif>
                             {{ userTime($display_arrival->time) }}
                         </span>
+                        @if($display_arrival->cancelled)
+                            <span class="text-danger">Ausfall</span>
+                        @endif
                     </span>
                     <a href="{{route('trains.stationboard', ['provider' => 'train', 'station' => $status->checkin->destinationStation->ibnr])}}"
                        class="text-trwl clearfix">
@@ -176,20 +245,23 @@
                         </span>
                 </li>
             @endcan
+            <!--
             <li class="like-text list-inline-item">
                 <i class="fas {{$status->visibility->faIcon()}} visibility-icon text-small"
                    aria-hidden="true" title="{{$status->visibility->title()}}"
                    data-mdb-toggle="tooltip"
                    data-mdb-placement="top"></i>
             </li>
+            -->
             <li class="like-text list-inline-item">
                 <div class="dropdown">
                     <a href="#" data-mdb-toggle="dropdown" aria-expanded="false">
                         &nbsp;
-                        <i class="fa fa-ellipsis-vertical" aria-hidden="true"></i>
+                        <i class="fa fa-edit" aria-hidden="true"></i>
                         &nbsp;
                     </a>
                     <ul class="dropdown-menu">
+                        <!--
                         <li>
                             <button class="dropdown-item trwl-share"
                                     type="button"
@@ -206,6 +278,7 @@
                                 {{__('menu.share')}}
                             </button>
                         </li>
+                        -->
                         @auth
                             @if(auth()->user()->id === $status->user_id)
                                 <li>
@@ -217,11 +290,31 @@
                                         {{__('edit')}}
                                     </button>
                                 </li>
+                                @if($canCheckin || isset($status->taken))
+                                    <li>
+                                        <button class="dropdown-item edit-taken" type="button"
+                                                data-trwl-status-id="{{ $status->id }}">
+                                            <div class="dropdown-icon-suspense">
+                                                <i class="fas fa-train" aria-hidden="true"></i>
+                                            </div>
+                                            Mitgefahren?
+                                        </button>
+                                    </li>
+                                @endif
+                                <li>
+                                    <button class="dropdown-item edit-destination" type="button"
+                                            data-trwl-status-id="{{ $status->id }}">
+                                        <div class="dropdown-icon-suspense">
+                                            <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
+                                        </div>
+                                        {{ __('modals.editStatusDestination-title') }}
+                                    </button>
+                                </li>
                                 <li>
                                     <button class="dropdown-item delete" type="button"
                                             data-mdb-toggle="modal"
                                             data-mdb-target="#modal-status-delete"
-                                            onclick="document.querySelector('#modal-status-delete input[name=\'statusId\']').value = '{{$status->id}}';">
+                                            onclick="document.querySelector('#modal-status-delete input[name=\'statusId\']').value = '{{$status->id}}'; document.getElementById('delete-status-context').innerHTML = statusContextString(document.getElementById('status-{{ $status->id }}').dataset);">
                                         <div class="dropdown-icon-suspense">
                                             <i class="fas fa-trash" aria-hidden="true"></i>
                                         </div>
@@ -270,6 +363,7 @@
         </ul>
 
         <ul class="list-inline">
+            <!--
             <li id="avatar-small-{{ $status->id }}" class="d-lg-none list-inline-item">
                 <a href="{{ route('profile', ['username' => $status->user->username]) }}">
                     <img
@@ -277,7 +371,9 @@
                         class="profile-image" alt="{{__('settings.picture')}}">
                 </a>
             </li>
+            -->
             <li class="list-inline-item">
+                <!--
                 <a href="{{ route('profile', ['username' => $status->user->username]) }}">
                     @if(auth()?->user()?->id == $status->user_id)
                         {{__('user.you')}}
@@ -286,9 +382,14 @@
                     @endif
                 </a>
                 {{__('dates.-on-')}}
-                <a href="{{ route('status', ['id' => $status->id]) }}">
-                    {{ userTime($status->created_at) }}
-                </a>
+                -->
+                <a href="{{ route('status', ['id' => $status->id]) }}" class="status-date">
+                    {{ userTime($status->checkin->departure,'dd DD.MM.') }}
+                </a>@if($status->travelChain !== null && Route::current()->uri != "travelchain/{id}") |
+                    <a href="{{ route('travelchain', ['id' => $status->travelChain->id]) }}" class="status-chain fw-bold">
+                        {{ $status->travelChain->title }}
+                    </a>
+                @endif
             </li>
         </ul>
     </div>

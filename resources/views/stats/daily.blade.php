@@ -60,23 +60,25 @@
                     </div>
                 @else
                     <div class="row text-center fs-5" id="daily-stats-statsbar">
-                        <div class="col-6 mb-3 col-lg-3">
+                        <div class="col-12 mb-4 col-lg-4">
                             <i class="fa-solid fa-train"></i>
                             {{$statuses->count()}}
                             {{__('stats.trips')}}
                         </div>
-                        <div class="col-6 mb-3 col-lg-3">
+                        <div class="col-6 mb-4 col-lg-4">
                             <i class="fa-solid fa-route"></i>
                             {{round($statuses->sum('checkin.distance') / 1000)}} km
                         </div>
-                        <div class="col-6 mb-3 col-lg-3">
+                        <div class="col-6 mb-4 col-lg-4">
                             <i class="fa-regular fa-clock"></i>
                             {!! durationToSpan(secondsToDuration($statuses->sum('checkin.duration') * 60)) !!}
                         </div>
+                        <!--
                         <div class="col-6 mb-3 col-lg-3">
                             <i class="fa fa-dice-d20"></i>
                             {{$statuses->sum('checkin.points')}} {{__('profile.points-abbr')}}
                         </div>
+                        -->
                     </div>
 
                     @foreach($statuses as $status)
@@ -87,6 +89,5 @@
         </div>
     </div>
 
-    @include('includes.edit-modal')
-    @include('includes.delete-modal')
+    @include('includes.status-modals')
 @endsection

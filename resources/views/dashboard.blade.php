@@ -15,7 +15,7 @@
 
                         {{__('overlapping-checkin.description', ['lineName' => session()->get('checkin-collision')['lineName']])}}
                         {{__('overlapping-checkin.description2')}}
-                        {{__('no-points-warning')}}
+                        {{-- __('no-points-warning') --}}
 
                         <hr/>
 
@@ -34,10 +34,10 @@
                                    value="{{session()->get('checkin-collision')['validated']['arrival']}}"/>
                             <input type="hidden" name="body"
                                    value="{{session()->get('checkin-collision')['validated']['body'] ?? ''}}"/>
-                            <input type="hidden" name="business_check"
-                                   value="{{session()->get('checkin-collision')['validated']['business_check']}}"/>
-                            <input type="hidden" name="checkinVisibility"
-                                   value="{{session()->get('checkin-collision')['validated']['checkinVisibility']}}"/>
+                            {{-- <input type="hidden" name="business_check"
+                                   value="{{session()->get('checkin-collision')['validated']['business_check']}}"/> --}}
+                            {{-- <input type="hidden" name="checkinVisibility"
+                                   value="{{session()->get('checkin-collision')['validated']['checkinVisibility']}}"/> --}}
                             @isset(session()->get('validated')['tweet_check'])
                                 <input type="hidden" name="tweet_check"
                                        value="{{session()->get('checkin-collision')['validated']['tweet_check']}}"/>
@@ -69,9 +69,9 @@
                         <Stationautocomplete :dashboard="true"></Stationautocomplete>
                     </div>
                 @else
-                    @include('includes.station-autocomplete')
+                    @include('includes.autocomplete')
                 @endif
-                @if($future->count() >= 1)
+                @if(isset($future) && $future->count() >= 1)
                     <div class="accordion accordion-flush" id="accordionFutureCheckIns">
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-headingOne">
@@ -98,6 +98,34 @@
                     </div>
                 @endif
 
+                @if(isset($ctaStatuses) && $ctaStatuses->count() >= 1)
+                    <div class="alert alert-warning px-3">
+                        <h4>
+                            {{ __('travelchain.ctaStatuses-head') }}
+                        </h4>
+                        <p>
+                            {{ __('travelchain.ctaStatuses-body') }}
+                        </p>
+                        <div class="statuses ctaStatuses">
+                            @include('includes.statuses', ['statuses' => $ctaStatuses, 'showDates' => false])
+                        </div>
+                    </div>
+                @endif
+
+                @if(isset($noChain) && $noChain->count() >= 1)
+                    <div class="alert alert-warning px-3">
+                        <h4>
+                            {{ __('dashboard.noChain-head') }}
+                        </h4>
+                        <p>
+                            {{ __('dashboard.noChain-body') }}
+                        </p>
+                        <div class="statuses noChainStatuses">
+                            @include('includes.statuses', ['statuses' => $noChain, 'showDates' => false])
+                        </div>
+                    </div>
+                @endif
+
                 @if(config('trwl.year_in_review.alert'))
                     <div class="alert alert-info">
                         <h4 class="alert-heading">
@@ -112,11 +140,48 @@
                     </div>
                 @endif
 
-                @include('includes.statuses', ['statuses' => $statuses, 'showDates' => true])
-                {{ $statuses->links() }}
+                @if(isset($chainsInProgress))
+                    <h2 class="mb-2 fs-3">Laufende Reisekette</h2>
+                    @php
+                        $cipCount = $chainsInProgress->count();
+                    @endphp
+                    @if($cipCount > 0)
+                        @if($cipCount > 1)
+                            <div class="alert alert-warning text-center">
+                                In der Regel sollte nur eine Reisekette im Gange und die Erfassung der vorherigen Reiseketten bereits abgeschlossen sein. Bitte erfassen Sie die Fahrten und Beendigung der Reisekette so zeitnah wie möglich.
+                            </div>
+                        @endif
+                        @include('includes.chains', ['chains' => $chainsInProgress])
+                    @else
+                        <p>&mdash;</p>
+                    @endif
+                @endif
 
-                @include('includes.edit-modal')
-                @include('includes.delete-modal')
+                @isset($finishedChains)
+                    @php
+                        $f_cP = $finishedChains->currentPage();
+                    @endphp
+                    <h2 class="mb-2 fs-3">Abgeschlossene Reiseketten @if($f_cP > 1)<small style="font-size: small;">(Seite {{ $f_cP }})</small>@endif</h2>
+                    @if($finishedChains->count() > 0)
+                        @include('includes.chains', ['chains' => $finishedChains])
+                    @else
+                        <p>&mdash;</p>
+                    @endif
+                    {{ $finishedChains->onEachSide(1)->links() }}
+                @endisset
+
+                @if(isset($chainsInProgress) || isset($finishedChains))
+                    @include('includes.chain-modals')
+                @endif
+
+                @isset($statuses)
+                    @include('includes.statuses', ['statuses' => $statuses, 'showDates' => true])
+                    {{ $statuses->links() }}
+                @endisset
+
+                @if(isset($statuses) || isset($future) || isset($noChain))
+                    @include('includes.status-modals')
+                @endif
             </div>
         </div>
     </div>

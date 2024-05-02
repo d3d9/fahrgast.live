@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Webhook;
 use App\Policies\FollowPolicy;
 use App\Policies\StatusPolicy;
+use App\Policies\TravelChainPolicy;
 use App\Policies\StatusTagPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WebhookPolicy;
@@ -29,6 +30,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Status::class    => StatusPolicy::class,
+        TravelChain::class => TravelChainPolicy::class,
         User::class      => UserPolicy::class,
         Follow::class    => FollowPolicy::class,
         Webhook::class   => WebhookPolicy::class,

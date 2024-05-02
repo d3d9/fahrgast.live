@@ -9,13 +9,13 @@
 <meta name="DC.Language" content="{{ str_replace('_', '-', app()->getLocale()) }}"/>
 
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="#c72730"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="#8C2D82"/>
 <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('images/icons/touch-icon-ipad.png') }}"/>
 <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/icons/touch-icon-iphone-retina.png') }}"/>
 <link rel="apple-touch-icon" sizes="167x167" href="{{ asset('images/icons/touch-icon-ipad-retina.png') }}"/>
 
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#c72730"/>
+<meta name="theme-color" content="#8C2D82"/>
 <meta name="name" content="{{ config('app.name') }}"/>
 
 @hasSection('canonical')

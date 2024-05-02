@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Collections\StatusCollection;
 use App\Enum\Business;
 use App\Enum\StatusVisibility;
+use App\Enum\NotTakenReason;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 /**
  * @property int              id
  * @property int              user_id
+ * @property int              chain_id
  * @property string           body
  * @property Business         business
  * @property StatusVisibility visibility
@@ -21,6 +25,9 @@ use Illuminate\Support\Facades\Auth;
  * @property string           tweet_id
  * @property string           mastodon_post_id
  * @property Checkin          $checkin
+ * @property boolean          planned
+ * @property boolean          taken
+ * @property NotTakenReason   not_taken_reason
  *
  * @todo merge model with "Checkin" (later only "Checkin") because the difference between trip sources (HAFAS,
  *       User, and future sources) should be handled in the Trip model.
@@ -30,22 +37,40 @@ class Status extends Model
 
     use HasFactory;
 
-    protected $fillable = ['user_id', 'body', 'business', 'visibility', 'event_id', 'tweet_id', 'mastodon_post_id', 'client_id'];
-    protected $hidden   = ['user_id', 'business'];
+    protected $fillable = ['user_id', 'chain_id', 'body', 'business', 'visibility', 'event_id', 'tweet_id', 'mastodon_post_id', 'client_id', 'planned', 'taken', 'not_taken_reason'];
+    protected $hidden   = ['user_id', 'chain_id', 'business'];
     protected $appends  = ['favorited', 'socialText', 'statusInvisibleToMe', 'description'];
     protected $casts    = [
         'id'               => 'integer',
         'user_id'          => 'integer',
+        'chain_id'         => 'integer',
         'business'         => Business::class,
         'visibility'       => StatusVisibility::class,
         'event_id'         => 'integer',
         'tweet_id'         => 'string',
         'mastodon_post_id' => 'string',
-        'client_id'        => 'integer'
+        'client_id'        => 'integer',
+        'planned'          => 'boolean',
+        'taken'            => 'boolean',
+        'not_taken_reason' => NotTakenReason::class,
     ];
+
+    public function newCollection(array $models = []): StatusCollection {
+        return new StatusCollection($models);
+    }
 
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
+    }
+
+    public function travelChain(): BelongsTo {
+        return $this->belongsTo(TravelChain::class, 'chain_id');
+    }
+
+    public function canCheckin(): ?bool {
+        if (!isset($this->travelChain) || isset($this->taken)) return false;
+        // siehe statusbackend & travelchain cta*
+        return $this->checkin->departure <= Carbon::parse('+5min');
     }
 
     public function likes(): HasMany {

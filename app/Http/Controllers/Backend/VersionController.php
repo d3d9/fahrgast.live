@@ -8,10 +8,10 @@ use Exception;
 abstract class VersionController extends Controller
 {
     public static function getVersion(): bool|string {
-        if (file_exists(base_path() . '/VERSION')) {
+        /*if (file_exists(base_path() . '/VERSION')) {
             return trim(file_get_contents(base_path() . '/VERSION'));
-        }
-        return trim(self::getCurrentGitCommit());
+        }*/
+        return substr(trim(self::getCurrentGitCommit()), 0, 7);
     }
 
     private static function getGitHead(): bool|string {

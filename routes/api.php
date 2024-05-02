@@ -24,6 +24,7 @@ use App\Http\Controllers\API\v1\SettingsController;
 use App\Http\Controllers\API\v1\StationController;
 use App\Http\Controllers\API\v1\StatisticsController;
 use App\Http\Controllers\API\v1\StatusController;
+use App\Http\Controllers\API\v1\TravelChainController;
 use App\Http\Controllers\API\v1\StatusTagController;
 use App\Http\Controllers\API\v1\SupportController;
 use App\Http\Controllers\API\v1\TokenController;
@@ -60,6 +61,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['return-json']], static functio
         });
         Route::group(['middleware' => ['scope:write-statuses']], static function() {
             Route::delete('status/{id}', [StatusController::class, 'destroy'])->whereNumber('id');
+            Route::delete('travelchain/{id}', [TravelChainController::class, 'destroy'])->whereNumber('id'); // FGL
             Route::put('status/{id}', [StatusController::class, 'update']);
             Route::post('status/{statusId}/tags', [StatusTagController::class, 'store']);
             Route::put('status/{statusId}/tags/{tagKey}', [StatusTagController::class, 'update']);

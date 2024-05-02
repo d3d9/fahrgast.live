@@ -46,7 +46,7 @@ const popularStations = [
                 window.awesomplete.list = json.map(station => {
                     return {
                         value: station.name,
-                        label: station.name + (station.rilIdentifier ? " (" + station.rilIdentifier + ")" : "")
+                        label: station.name // + (station.rilIdentifier ? " (" + station.rilIdentifier + ")" : "")
                     };
                 });
             });

@@ -10,9 +10,11 @@ use App\Exceptions\PermissionException;
 use App\Exceptions\StatusAlreadyLikedException;
 use App\Http\Controllers\API\v1\Controller as APIController;
 use App\Http\Controllers\Backend\Support\LocationController;
+use App\Http\Controllers\TravelChainController;
 use App\Models\Event;
 use App\Models\Like;
 use App\Models\Status;
+use App\Models\TravelChain;
 use App\Models\User;
 use App\Notifications\StatusLiked;
 use Carbon\Carbon;
@@ -20,6 +22,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -264,10 +267,48 @@ class StatusController extends Controller
                      ->simplePaginate(15);
     }
 
+    public static function getNoChainCheckins(): ?Collection {
+        return auth()->user()->statuses()
+                     ->with([
+                                'user', 'checkin.originStation', 'checkin.destinationStation',
+                                'checkin.trip',
+                            ])
+                     ->orderByDesc('created_at')
+                     ->whereNull('chain_id')
+                     ->get()->values();
+    }
+
+    public static function ctaCheckinQuery(?TravelChain $chain = NULL): HasMany {
+        return auth()->user()->statuses()
+                     ->with([
+                                'user', 'checkin.originStation', 'checkin.destinationStation',
+                                'checkin.trip',
+                            ])
+                     ->whereNotNull('chain_id') // kein chain = keine aufforderung.
+                     ->whereNull('taken')
+                     ->when($chain, function($query, $chain) {
+                         return $query->where('chain_id', $chain->id);
+                     })
+                     ->whereHas('checkin', function($query) { // 5 min wie in model
+                          $query->where('departure', '<=', date('Y-m-d H:i:s', strtotime('+5min')));
+                     });
+    }
+
+    public static function getCtaCheckins(?TravelChain $chain = NULL): ?Collection {
+        return self::ctaCheckinQuery($chain)
+            ->get()
+            ->sortBy(function(Status $status) {
+                 return $status->checkin->departure;
+            })
+            ->values();
+    }
+
     public static function createStatus(
         User             $user,
         Business         $business,
         StatusVisibility $visibility,
+        TravelChain      $travelChain = null,
+        bool             $planned = null,
         string           $body = null,
         Event            $event = null
     ): Status {
@@ -279,10 +320,18 @@ class StatusController extends Controller
             $event = null;
         }
 
+        if (isset($travelChain)) {
+            //
+        } else {
+            $travelChain = TravelChainController::createTravelChain($user);
+        }
+
         return Status::create([
                                   'user_id'    => $user->id,
+                                  'chain_id'   => $travelChain->id,
+                                  'planned'    => $planned,
                                   'body'       => $body,
-                                  'business'   => $business,
+                                  'business'   => $travelChain->business ?? Business::PRIVATE,
                                   'visibility' => $visibility,
                                   'event_id'   => $event?->id,
                                   'client_id'  => APIController::getCurrentOAuthClient()?->id,

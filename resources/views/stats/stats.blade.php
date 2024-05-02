@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                @include('stats.includes.global_cards')
+                {{-- @include('stats.includes.global_cards') --}}
 
                 <h4>
                     {{__('experimental-features')}}

@@ -90,6 +90,97 @@ abstract class HafasController extends Controller
     }
 
     /**
+     * @throws HafasException
+     */
+    public static function getLocations(string $query, int $results = 15): Collection {
+        try {
+            $response = self::getHttpClient()
+                            ->get("/locations",
+                                  [
+                                      'query'     => $query,
+                                      'fuzzy'     => 'true',
+                                      'stops'     => 'true',
+                                      'addresses' => 'true',
+                                      'poi'       => 'false',
+                                      'language'  => 'de',
+                                      'results'   => $results
+                                  ]);
+
+            $data = json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+            if (empty($data) || !$response->ok()) {
+                return Collection::empty();
+            }
+
+            return self::parseHafasLocations($data);
+        } catch (JsonException $exception) {
+            throw new HafasException($exception->getMessage());
+        }
+    }
+
+    /**
+     * @throws HafasException
+     */
+    public static function getJourneys(
+        Array $fromParameters,
+        Array $toParameters,
+        ?Carbon $when = null,
+        bool $arr = false,
+        ?string $earlierRef = null,
+        ?string $laterRef = null,
+        ?array $travelType = null,
+        int $transferTime = 0,
+        ?string $walkingSpeed = 'normal'
+    ): stdClass {
+        if (!isset($earlierRef) && !isset($laterRef) && !isset($when)) { throw new Exception('earlierRef or laterRef or when required'); }
+        if (isset($earlierRef) && isset($laterRef)) { throw new Exception('only one of earlierRef or laterRef accepted'); }
+        try {
+            $params = [
+                          'language' => 'de'
+                      ];
+            if (isset($earlierRef)) {
+                $params['earlierThan'] = $earlierRef;
+            } else if (isset($laterRef)) {
+                $params['laterThan'] = $laterRef;
+            } else {
+                $params[$arr ? 'arrival' : 'departure'] = $when->toIso8601String();
+            }
+            if (isset($transferTime)) $params['transferTime'] = $transferTime;
+            if (isset($walkingSpeed)) $params['walkingSpeed'] = $walkingSpeed;
+            $ttMapping = [
+                TravelType::EXPRESS->value => [HTT::NATIONAL_EXPRESS, HTT::NATIONAL],
+                TravelType::REGIONAL->value => [HTT::REGIONAL_EXP, HTT::REGIONAL],
+                TravelType::SUBURBAN->value => [HTT::SUBURBAN],
+                TravelType::BUS->value => [HTT::BUS],
+                TravelType::FERRY->value => [HTT::FERRY],
+                TravelType::SUBWAY->value => [HTT::SUBWAY],
+                TravelType::TRAM->value => [HTT::TRAM],
+                TravelType::TAXI->value => [HTT::TAXI],
+            ];
+            if(!empty($travelType)) { // sorry diese variablennamen sind schrecklich
+                $travelTypeValues = array_map(function($v) { return $v->value; }, $travelType);
+                foreach($ttMapping as $_m_tt => $_m_htt_a) {
+                    $tt_match = in_array($_m_tt, $travelTypeValues);
+                    foreach($_m_htt_a as $_m_htt) {
+                        $params[$_m_htt->value] = $tt_match ? 'true' : 'false';
+                    }
+                }
+            }
+            $params = array_merge($fromParameters, $toParameters, $params);
+            $response = self::getHttpClient()->get("/journeys", $params);
+
+            $data = json_decode($response->body(), false, 512, JSON_THROW_ON_ERROR);
+            if (empty($data) || !$response->ok()) {
+                if (isset($data->msg)) throw new HafasException($data->msg);
+                return new stdClass; // FGLTODO: stattdessen throwen?
+            }
+
+            return $data;
+        } catch (JsonException $exception) {
+            throw new HafasException($exception->getMessage());
+        }
+    }
+
+    /**
      * @param stdClass $hafasStop
      *
      * @return Station
@@ -129,6 +220,26 @@ abstract class HafasController extends Controller
                           return array_search($station->ibnr, $ibnrs);
                       })
                       ->values();
+    }
+
+    private static function parseHafasLocations(array $hafasResponse): Collection {
+        $payload = [];
+        $upsertPayload = [];
+        foreach ($hafasResponse as $hafasStation) {
+            if ($hafasStation->type === "station" || $hafasStation->type === "stop") {
+                $upsertPayload[] = [
+                    'ibnr'      => $hafasStation->id,
+                    'name'      => $hafasStation->name,
+                    'latitude'  => $hafasStation?->location?->latitude,
+                    'longitude' => $hafasStation?->location?->longitude,
+                ];
+            }
+            unset($hafasStation->products);
+            $payload[] = $hafasStation;
+        }
+        self::upsertStations($upsertPayload);
+        // return Station::whereIn('ibnr', $ibnrs)->get();
+        return new Collection($payload);
     }
 
     /**
@@ -185,7 +296,7 @@ abstract class HafasController extends Controller
             HTT::FERRY->value            => self::checkTravelType($type, TravelType::FERRY),
             HTT::SUBWAY->value           => self::checkTravelType($type, TravelType::SUBWAY),
             HTT::TRAM->value             => self::checkTravelType($type, TravelType::TRAM),
-            HTT::TAXI->value             => 'false',
+            HTT::TAXI->value             => self::checkTravelType($type, TravelType::TAXI),
         ];
         $response = $client->get('/stops/' . $station->ibnr . '/departures', $query);
 

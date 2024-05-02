@@ -24,11 +24,13 @@ use App\Http\Controllers\Frontend\StatisticController;
 use App\Http\Controllers\Frontend\Stats\DailyStatsController;
 use App\Http\Controllers\Frontend\Support\SupportController;
 use App\Http\Controllers\Frontend\Transport\StatusController;
+use App\Http\Controllers\Frontend\Transport\TravelChainController;
 use App\Http\Controllers\Frontend\User\ProfilePictureController;
 use App\Http\Controllers\Frontend\WebFingerController;
 use App\Http\Controllers\Frontend\WebhookController;
 use App\Http\Controllers\FrontendStaticController;
 use App\Http\Controllers\FrontendStatusController;
+use App\Http\Controllers\FrontendTravelChainController;
 use App\Http\Controllers\FrontendTransportController;
 use App\Http\Controllers\FrontendUserController;
 use App\Http\Controllers\PrivacyAgreementController;
@@ -57,37 +59,42 @@ Route::prefix('legal')->group(function() {
 });
 
 Route::redirect('/profile/{username}', '/@{username}');
-Route::get('/@{username}', [FrontendUserController::class, 'getProfilePage'])
-     ->name('profile');
+//Route::get('/@{username}', [FrontendUserController::class, 'getProfilePage'])
+//     ->name('profile');
 
-Route::get('/leaderboard', [LeaderboardController::class, 'renderLeaderboard'])
-     ->name('leaderboard');
+// Route::get('/leaderboard', [LeaderboardController::class, 'renderLeaderboard'])
+//     ->name('leaderboard');
 
-Route::get('/leaderboard/{date}', [LeaderboardController::class, 'renderMonthlyLeaderboard'])
-     ->name('leaderboard.month');
+// Route::get('/leaderboard/{date}', [LeaderboardController::class, 'renderMonthlyLeaderboard'])
+//      ->name('leaderboard.month');
 
-Route::get('/statuses/active', [FrontendStatusController::class, 'getActiveStatuses'])
-     ->name('statuses.active');
+// Route::get('/statuses/active', [FrontendStatusController::class, 'getActiveStatuses'])
+//      ->name('statuses.active');
 
-Route::permanentRedirect('/statuses/event/{slug}', '/event/{slug}');
-Route::get('/event/{slug}', [FrontendStatusController::class, 'statusesByEvent'])
-     ->name('event');
+// Route::permanentRedirect('/statuses/event/{slug}', '/event/{slug}');
+// Route::get('/event/{slug}', [FrontendStatusController::class, 'statusesByEvent'])
+//      ->name('event');
 
-Route::get('/events', [EventController::class, 'renderEventOverview'])
-     ->name('events');
+// Route::get('/events', [EventController::class, 'renderEventOverview'])
+//      ->name('events');
 
-Route::get('/changelog', [ChangelogController::class, 'renderChangelog'])
-     ->name('changelog');
+// Route::get('/changelog', [ChangelogController::class, 'renderChangelog'])
+//      ->name('changelog');
 
 Auth::routes(['verify' => true]);
 
-Route::get('/auth/redirect/mastodon', [MastodonController::class, 'redirect']);
-Route::get('/callback/mastodon', [MastodonController::class, 'callback']);
+// Route::get('/auth/redirect/mastodon', [MastodonController::class, 'redirect']);
+// Route::get('/callback/mastodon', [MastodonController::class, 'callback']);
 
 Route::get('/status/{id}', [FrontendStatusController::class, 'getStatus'])
      ->whereNumber('id')
      ->name('status');
 
+Route::get('/travelchain/{id}', [FrontendTravelChainController::class, 'getTravelChain'])
+     ->whereNumber('id')
+     ->name('travelchain');
+
+/*
 Route::prefix('blog')->group(function() {
     Route::permanentRedirect('/', 'https://blog.traewelling.de')
          ->name('blog.all');
@@ -99,6 +106,7 @@ Route::prefix('blog')->group(function() {
         return redirect('https://blog.traewelling.de/categories/' . strtolower($category), 301);
     })->name('blog.category');
 });
+*/
 
 /**
  * These routes can be used by logged in users although they have not signed the privacy policy yet.
@@ -113,16 +121,20 @@ Route::middleware(['auth'])->group(function() {
 
     Route::post('/settings/destroy', [AccountController::class, 'deleteUserAccount'])
          ->name('account.destroy');
+
+    Route::get('/@{username}', [FrontendUserController::class, 'getProfilePage'])
+         ->name('profile');
 });
 
 
-Route::get('/ics', [IcsController::class, 'renderIcs'])
-     ->name('ics');
+// Route::get('/ics', [IcsController::class, 'renderIcs'])
+//      ->name('ics');
 
 /**
  * All of these routes can only be used by fully registered users.
  */
 Route::middleware(['auth', 'privacy'])->group(function() {
+    /*
     Route::view('/beta/trip-creation', 'closed-beta.trip-creation')
          ->can('create-manual-trip')
          ->name('beta.trip-creation');
@@ -134,7 +146,9 @@ Route::middleware(['auth', 'privacy'])->group(function() {
 
     Route::post('/destroy/provider', [SocialController::class, 'destroyProvider'])
          ->name('provider.destroy'); //TODO: Replace with API Endpoint
+    */
 
+    /*
     Route::prefix('stats')->group(static function() {
         Route::get('/', [StatisticController::class, 'renderMainStats'])
              ->name('stats');
@@ -143,12 +157,16 @@ Route::middleware(['auth', 'privacy'])->group(function() {
         Route::get('/daily/{dateString}', [DailyStatsController::class, 'renderDailyStats'])
              ->name('stats.daily');
     });
+    */
 
+    /*
     Route::get('/support', [SupportController::class, 'renderSupportPage'])->name('support');
     Route::post('/support/submit', [SupportController::class, 'submit'])->name('support.submit'); //TODO: Replace with API Endpoint
+    */
 
     Route::prefix('settings')->group(function() {
 
+        /*
         Route::prefix('/applications')->group(function() {
             Route::get('/', [DevController::class, 'renderAppList'])->name('dev.apps');
             Route::post('/createPersonalAccessToken', [DevController::class, 'createPersonalAccessToken'])
@@ -159,28 +177,30 @@ Route::middleware(['auth', 'privacy'])->group(function() {
             Route::post('/{appId}/destroy', [DevController::class, 'destroyApp'])->name('dev.apps.destroy'); //TODO: Replace with API Endpoint
             Route::post('/', [DevController::class, 'createApp'])->name('dev.apps.create.post');             //TODO: Replace with API Endpoint
         });
+        */
 
         Route::redirect('/', 'settings/profile')->name('settings');
         Route::get('/profile', [SettingsController::class, 'renderProfile'])->name('settings.profile');
-        Route::get('/privacy', [SettingsController::class, 'renderPrivacy'])->name('settings.privacy');
+        // Route::get('/privacy', [SettingsController::class, 'renderPrivacy'])->name('settings.privacy');
         Route::post('/profile', [SettingsController::class, 'updateMainSettings']);
-        Route::post('/update/privacy', [SettingsController::class, 'updatePrivacySettings'])
-             ->name('settings.privacy.update');
+        // Route::post('/update/privacy', [SettingsController::class, 'updatePrivacySettings'])
+        //     ->name('settings.privacy.update');
 
         Route::view('/account', 'settings.account')
              ->name('settings.account');
         Route::post('/account/update', [SettingsController::class, 'updatePassword'])
              ->name('password.change');
 
-        Route::get('/security/login-providers', [SettingsController::class, 'renderLoginProviders'])
-             ->name('settings.login-providers');
+        // Route::get('/security/login-providers', [SettingsController::class, 'renderLoginProviders'])
+        //      ->name('settings.login-providers');
         Route::get('/security/sessions', [SettingsController::class, 'renderSessions'])
              ->name('settings.sessions');
 
-        Route::get('/security/ics', [SettingsController::class, 'renderIcs'])->name('settings.ics');
-        Route::get('/security/api-tokens', [SettingsController::class, 'renderToken'])->name('settings.tokens');
-        Route::get('/security/webhooks', [SettingsController::class, 'renderWebhooks'])->name('settings.webhooks');
+        // Route::get('/security/ics', [SettingsController::class, 'renderIcs'])->name('settings.ics');
+        // Route::get('/security/api-tokens', [SettingsController::class, 'renderToken'])->name('settings.tokens');
+        // Route::get('/security/webhooks', [SettingsController::class, 'renderWebhooks'])->name('settings.webhooks');
 
+        /*
         Route::get('/follower', [SettingsController::class, 'renderFollowerSettings'])
              ->name('settings.follower');
         Route::post('/follower/remove', [\App\Http\Controllers\SettingsController::class, 'removeFollower'])
@@ -195,26 +215,40 @@ Route::middleware(['auth', 'privacy'])->group(function() {
 
         Route::post('/uploadProfileImage', [FrontendUserController::class, 'updateProfilePicture'])
              ->name('settings.upload-image');
+        */
 
         Route::post('/delsession', [UserController::class, 'deleteSession'])
              ->name('delsession'); //TODO: Replace with API Endpoint
-        Route::post('/deltoken', [UserController::class, 'deleteToken'])
-             ->name('deltoken'); //TODO: Replace with API Endpoint
-        Route::post('/delwebhook', [WebhookController::class, 'deleteWebhook'])
-             ->name('delwebhook'); //TODO: Replace with API Endpoint
+        // Route::post('/deltoken', [UserController::class, 'deleteToken'])
+        //      ->name('deltoken'); //TODO: Replace with API Endpoint
+        // Route::post('/delwebhook', [WebhookController::class, 'deleteWebhook'])
+        //      ->name('delwebhook'); //TODO: Replace with API Endpoint
     });
 
     Route::get('/dashboard', [FrontendStatusController::class, 'getDashboard'])
          ->name('dashboard');
 
-    Route::get('/dashboard/global', [FrontendStatusController::class, 'getGlobalDashboard'])
-         ->name('globaldashboard');
+    // Route::get('/dashboard/global', [FrontendStatusController::class, 'getGlobalDashboard'])
+    //      ->name('globaldashboard');
 
     Route::post('/status/update', [StatusController::class, 'updateStatus'])
          ->name('status.update'); //TODO: Replace with API Endpoint
 
-    Route::view('/export', 'export')->name('export');
+    Route::post('/status/updateDestination', [StatusController::class, 'updateStatusDestination'])
+         ->name('status.updateDestination'); //TODO: Replace with API Endpoint
 
+    Route::post('/status/updateTaken', [StatusController::class, 'updateStatusTaken'])
+         ->name('status.updateTaken'); //TODO: Replace with API Endpoint
+
+    Route::post('/travelchain/update', [TravelChainController::class, 'updateTravelChain'])
+         ->name('travelchain.update'); //TODO: Replace with API Endpoint
+
+    Route::post('/travelchain/updateFinish', [TravelChainController::class, 'updateTravelChainFinish'])
+         ->name('travelchain.updateFinish'); //TODO: Replace with API Endpoint
+
+    // Route::view('/export', 'export')->name('export');
+
+    /*
     Route::post('/createfollow', [FrontendUserController::class, 'CreateFollow'])
          ->name('follow.create'); //TODO: Replace with API Endpoint
 
@@ -223,12 +257,18 @@ Route::middleware(['auth', 'privacy'])->group(function() {
 
     Route::post('/destroyfollow', [FrontendUserController::class, 'destroyFollow'])
          ->name('follow.destroy'); //TODO: Replace with API Endpoint
+    */
 
     Route::get('/transport/train/autocomplete/{station}', [FrontendTransportController::class, 'TrainAutocomplete'])
          ->name('transport.train.autocomplete');
+    Route::get('/transport/location/autocomplete/{query}', [FrontendTransportController::class, 'LocationAutocomplete'])
+         ->name('transport.location.autocomplete');
 
     Route::get('/trains/stationboard', [FrontendTransportController::class, 'TrainStationboard'])
          ->name('trains.stationboard');
+
+    Route::get('/trains/journey-planner', [FrontendTransportController::class, 'TrainJourneyPlanner'])
+         ->name('trains.journey-planner');
 
     Route::get('/trains/nearby', [FrontendTransportController::class, 'StationByCoordinates'])
          ->name('trains.nearby');
@@ -239,12 +279,16 @@ Route::middleware(['auth', 'privacy'])->group(function() {
     Route::post('/trains/checkin', [FrontendTransportController::class, 'TrainCheckin'])
          ->name('trains.checkin'); //TODO: Replace with API Endpoint
 
+    Route::post('/trains/journey-checkin', [FrontendTransportController::class, 'TrainJourneyCheckin'])
+         ->name('trains.journey-checkin');
+
     Route::get('/trains/setHome/', [FrontendTransportController::class, 'setTrainHome'])
          ->name('user.setHome'); //TODO: Replace with API Endpoint // why is this a GET request?
 
-    Route::get('/search/', [FrontendUserController::class, 'searchUser'])
-         ->name('userSearch');
+    // Route::get('/search/', [FrontendUserController::class, 'searchUser'])
+    //      ->name('userSearch');
 
+    /*
     Route::post('/user/block', [\App\Http\Controllers\Frontend\UserController::class, 'blockUser'])
          ->name('user.block'); //TODO: Replace with API Endpoint
     Route::post('/user/unblock', [\App\Http\Controllers\Frontend\UserController::class, 'unblockUser'])
@@ -253,8 +297,9 @@ Route::middleware(['auth', 'privacy'])->group(function() {
          ->name('user.mute'); //TODO: Replace with API Endpoint
     Route::post('/user/unmute', [\App\Http\Controllers\Frontend\UserController::class, 'unmuteUser'])
          ->name('user.unmute'); //TODO: Replace with API Endpoint
+    */
 });
 
-Route::get('/sitemap.xml', [SitemapController::class, 'renderSitemap']);
+// Route::get('/sitemap.xml', [SitemapController::class, 'renderSitemap']);
 
-Route::get('/.well-known/webfinger', [WebFingerController::class, 'endpoint']);
+// Route::get('/.well-known/webfinger', [WebFingerController::class, 'endpoint']);

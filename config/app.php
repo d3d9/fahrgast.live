@@ -88,15 +88,15 @@ return [
     'locale'  => 'de',
     'locales' => [
         'de'     => 'Deutsch',
-        'de_he'  => 'Deutsch (Südhessisch)',
-        'de_pfl' => 'Deutsch (Pfälzisch)',
-        'de_by'  => 'Deutsch (Bayerisch)',
-        'en'     => 'English',
-        'it'     => 'Italiano',
-        'fr'     => 'Français',
-        'nl'     => 'Nederlands',
-        'sv'     => 'Svenska',
-        'pl'     => 'Polski',
+        //'de_he'  => 'Deutsch (Südhessisch)',
+        //'de_pfl' => 'Deutsch (Pfälzisch)',
+        //'de_by'  => 'Deutsch (Bayerisch)',
+        ////'en'     => 'English',
+        //'it'     => 'Italiano',
+        //'fr'     => 'Français',
+        //'nl'     => 'Nederlands',
+        //'sv'     => 'Svenska',
+        //'pl'     => 'Polski',
     ],
 
     /*
@@ -110,7 +110,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'de',
 
     /*
     |--------------------------------------------------------------------------

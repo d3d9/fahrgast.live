@@ -55,13 +55,13 @@ body {
 }
 
 .color-main {
-    color: $trwlRot;
+    color: $imm;
 }
 
 .profile-banner {
-    background-image: url("../images/covers/profile-background.png");
-    background-position: center;
-    background-color: #c5232c;
+    /* background-image: url("../images/covers/profile-background.png");
+    background-position: center; */
+    background-color: $imm;
 }
 
 .profile-picture {
@@ -80,6 +80,25 @@ body {
 
 .profile-tag {
     font-size: map-get($font-sizes, 5);
+}
+
+.form-switch .form-check-input {
+  background-color: crimson;
+}
+.card-header .nav-tabs .nav-link {
+  --mdb-nav-tabs-link-padding-x: 15px;
+}
+
+#status_taken input:not(:checked) + label.btn {
+    filter: brightness(0.7) grayscale(0.3);
+}
+#status_taken input:checked + label.btn {
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.table.journeys>:not(caption)>*:last-child>* {
+    border: none;
 }
 
 @include media-breakpoint-up(md) {

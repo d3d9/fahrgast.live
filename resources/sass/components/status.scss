@@ -18,7 +18,7 @@
         border-radius: 0;
 
         .progress-bar {
-            background: rgb(192, 57, 43);
+            background: $imm;
 
             &.progress-pride {
                 background: linear-gradient(66deg,
@@ -46,9 +46,25 @@
     .list-inline {
         margin-bottom: 0;
 
-        .list-inline-item:not(:last-child) {
-            margin-right: 0.5rem;
+        .list-inline-item {
+            display: flex;
+            gap: 4px;
+            &:not(:last-child) {
+              margin-right: 0.5rem;
+            }
         }
+    }
+
+    .status-date {
+        flex-shrink: 0;
+        flex-grow: 0;
+        white-space: nowrap;
+    }
+
+    .status-chain {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .like-text {
@@ -67,6 +83,7 @@
     .dropdown-item {
         display: flex;
         flex-direction: row;
+        align-items: baseline;
         padding-left: 0;
     }
     .dropdown-icon-suspense {
@@ -76,4 +93,14 @@
         height: 2em;
         align-items: center;
     }
+}
+
+.alert-warning .status {
+  p, i {
+    color: unset;
+  }
+}
+
+.chain p:last-child {
+  margin-bottom: 0;
 }

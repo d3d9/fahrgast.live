@@ -110,10 +110,10 @@
 
     .trwl-bulletpoint {
         background: lighten($dm-base, 30%) !important;
-        border-color: $dm-trwlRot-shape;
+        border-color: $dm-imm-shape;
     }
     .text-trwl {
-        color: $dm-trwlRot !important;
+        color: $dm-imm !important;
     }
 
     ul.timeline > li:first-child:before {
@@ -125,7 +125,7 @@
     .status {
         .progress {
             .progress-bar {
-                background: $dm-trwlRot-shape;
+                background: $dm-imm-shape;
                 &.progress-pride {
                     background: linear-gradient(
                         66deg,
@@ -289,7 +289,7 @@
     }
 
     .bg-trwl {
-        background-color: desaturate(darken($dm-trwlRot, 45%), 20%) !important;
+        background-color: desaturate(darken($dm-imm, 45%), 20%) !important;
     }
 
     .bg-body {
@@ -315,7 +315,7 @@
 
     .alert-warning {
         background-color: hsl(40, 100%, 23%);
-        color: rgb(251, 251, 251);
+        color: rgb(251, 251, 251) !important;
     }
 
     .text-danger {
@@ -351,12 +351,13 @@
     }
 
     .profile-banner {
-        background: linear-gradient(
-                #{rgba(darken($dm-trwlRot, 60%), 0.4)},
-                #{rgba(darken($dm-trwlRot, 60%), 0.4)}
+        /* background: linear-gradient(
+                #{rgba(darken($dm-imm, 60%), 0.4)},
+                #{rgba(darken($dm-imm, 60%), 0.4)}
             ),
             url("/images/covers/profile-background.png");
-        background-position: center;
+        background-position: center; */
+        background-color: $imm;
     }
 
     .pagination {
@@ -412,7 +413,7 @@
     }
 
     .color-main {
-        color: $dm-trwlRot;
+        color: $dm-imm;
     }
 
     .leaflet-layer {
@@ -431,6 +432,6 @@
     }
 
     .leaflet-interactive {
-        stroke: $dm-trwlRot-shape;
+        stroke: $dm-imm-shape;
     }
 }

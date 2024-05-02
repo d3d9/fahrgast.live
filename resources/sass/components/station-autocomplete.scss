@@ -38,3 +38,22 @@
     }
   }
 }
+
+.location-value-state {
+    display: flex;
+    justify-content: center;
+    width: 2.5em;
+}
+.location-value-state > * {
+    position: absolute;
+    width: 1em;
+}
+.location-value-state--set {
+    visibility: hidden;
+}
+.location-value-source:not([value=""]) + .location-value-state > .location-value-state--empty {
+    visibility: hidden;
+}
+.location-value-source:not([value=""]) + .location-value-state > .location-value-state--set {
+    visibility: visible;
+}

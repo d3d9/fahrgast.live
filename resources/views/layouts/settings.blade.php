@@ -100,6 +100,7 @@
                                     {{ __('settings.title-profile') }}
                                 </a>
                             </li>
+                            <?php /*
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('settings.privacy')}}">
                                     <i class="fas fa-user-secret" aria-hidden="true"></i>
@@ -137,12 +138,14 @@
                                     {{ __('settings.title-loginservices') }}
                                 </a>
                             </li>
+                            */ ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('settings.sessions')}}">
                                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                     {{ __('settings.title-sessions') }}
                                 </a>
                             </li>
+                            <?php /*
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('settings.ics')}}">
                                     <i class="fas fa-calendar-alt" aria-hidden="true"></i>
@@ -167,18 +170,21 @@
                             <span>{{ __('settings.title-extra') }}</span>
                         </h6>
                         <ul class="nav flex-column mb-2">
+                            */ ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('settings.account')}}">
                                     <i class="fas fa-shield-alt" aria-hidden="true"></i>
                                     {{ __('settings.tab.account') }}
                                 </a>
                             </li>
+                            <?php /*
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('dev.apps')}}">
                                     <i class="fas fa-flask"></i>
                                     {{ __('your-apps') }}
                                 </a>
                             </li>
+                            */ ?>
                         </ul>
                     </div>
                 </nav>
@@ -194,7 +200,7 @@
         </div>
         <script>
             var token         = '{{ csrf_token() }}';
-            var urlDisconnect = '{{ route('provider.destroy') }}';
+            var urlDisconnect = '{{-- route('provider.destroy') --}}';
         </script>
     </body>
 </html>

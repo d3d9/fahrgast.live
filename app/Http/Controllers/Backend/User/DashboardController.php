@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Backend\User;
 use App\Enum\StatusVisibility;
 use App\Http\Controllers\Controller;
 use App\Models\Status;
+use App\Models\TravelChain;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
 abstract class DashboardController extends Controller
@@ -19,7 +21,7 @@ abstract class DashboardController extends Controller
         return Status::with([
                                 'event', 'likes', 'user.blockedByUsers', 'user.blockedUsers', 'checkin',
                                 'checkin.originStation', 'checkin.destinationStation',
-                                'checkin.Trip.stopovers.station'
+                                'checkin.Trip.stopovers.station', 'travelChain', 'user'
                             ])
                      ->join('train_checkins', 'train_checkins.status_id', '=', 'statuses.id')
                      ->select('statuses.*')

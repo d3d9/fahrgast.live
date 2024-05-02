@@ -113,9 +113,9 @@
                                     <td>{{$stopover->trainStation?->ibnr}}</td>
                                     <td>{{$stopover->trainStation?->rilIdentifier}}</td>
                                     <td>{{$stopover->arrival_planned?->format('H:i')}}</td>
-                                    <td>{{$stopover->arrival_real?->format('H:i')}}</td>
+                                    <td>{{$stopover->arrival_real?->format('H:i')}} {!! $stopover->isArrivalCancelled ? '<span class="text-warning">C</span>' : '' !!}</td>
                                     <td>{{$stopover->departure_planned?->format('H:i')}}</td>
-                                    <td>{{$stopover->departure_real?->format('H:i')}}</td>
+                                    <td>{{$stopover->departure_real?->format('H:i')}} {!! $stopover->isDepartureCancelled ? '<span class="text-warning">C</span>' : '' !!}</td>
                                 </tr>
                             @endforeach
                         </tbody>

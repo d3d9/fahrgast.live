@@ -6,6 +6,13 @@
                 <h4 class="modal-title">{{__('modals.deleteStatus-title')}}</h4>
                 <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <p id="delete-status-context" style="font-size: small;" class="mb-2 text-muted">Fahrt &mdash;</p>
+                <p class="mb-0">
+                    <!-- FGLTODO-LP: warnung falls teil der plan reisekette? -->
+                    {{ __('modals.deleteStatus-body') }}
+                </p>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-mdb-dismiss="modal">
                     {{__('menu.abort')}}

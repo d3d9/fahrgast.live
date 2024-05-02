@@ -1,11 +1,11 @@
 {
-    "name": "Träwelling",
-    "short_name": "Träwelling",
+    "name": "fahrgast.live",
+    "short_name": "fahrgast.live",
     "start_url": "/dashboard",
     "display": "standalone",
-    "theme_color": "#c72730",
+    "theme_color": "#8C2D82",
     "background_color": "#ffffff",
-    "description": "Free check-in service to log your public transit journeys",
+    "description": "ÖPNV-Erhebungsanwendung",
     "icons": [
         {
             "src": "images/icons/logo512.png",

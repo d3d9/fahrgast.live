@@ -3,7 +3,7 @@
  */
 import {Notyf} from "notyf";
 import {createApp} from "vue";
-import NotificationBell from "../vue/components/NotificationBell.vue";
+// import NotificationBell from "../vue/components/NotificationBell.vue";
 import ActiveJourneyMap from "../vue/components/ActiveJourneyMap.vue";
 import Stationboard from "../vue/components/Stationboard.vue";
 import StationAutocomplete from "../vue/components/StationAutocomplete.vue";
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const app = createApp({});
-    app.component("NotificationBell", NotificationBell);
+    // app.component("NotificationBell", NotificationBell);
     app.config.devtools = true;
     app.use(i18nVue, {
         fallbackLang: fallbackLang,
@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     app4.mount("#checkin-success-helper");
 
+    /*
     const app5 = createApp({});
     app5.component("TagHelper", TagHelper);
     app5.use(i18nVue, {
@@ -95,6 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
         resolve: (lang) => import(`../../lang/${lang}.json`)
     });
     app5.mount("#tag-helper");
+    */
 
     const app6 = createApp({});
     app6.component("TripCreationForm", TripCreationForm);
@@ -110,9 +112,11 @@ window.addEventListener("load", () => {
     import("./components/progressbar");
     import("./components/settings");
     import("./components/station-autocomplete");
+    import("./components/location-autocomplete");
     import("./components/stationboard");
     import("./components/stationboard-gps");
     import("./components/Status");
+    import("./components/TravelChain");
     import("./components/timepicker");
     import("./components/business-check-in");
     import("./appControls");

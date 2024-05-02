@@ -43,6 +43,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string      language
  * @property Carbon      last_login
  * @property Status[]    $statuses
+ * @property TravelChain[] $chains
  *
  * @todo replace "role" with an explicit permission system - e.g. spatie/laravel-permission
  * @todo replace "experimental" also with an explicit permission system - user can add self to "experimental" group
@@ -84,11 +85,15 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     public function getTrainDistanceAttribute(): float {
-        return Checkin::where('user_id', $this->id)->sum('distance');
+        return Checkin::where('user_id', $this->id)->whereHas('status', function($q) {$q->where('taken', 1);})->sum('distance');
     }
 
     public function statuses(): HasMany {
         return $this->hasMany(Status::class);
+    }
+
+    public function chains(): HasMany {
+        return $this->hasMany(TravelChain::class);
     }
 
     public function trainCheckins(): HasMany {
@@ -100,7 +105,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @return float
      */
     public function getTrainDurationAttribute(): float {
-        return Checkin::where('user_id', $this->id)->sum('duration');
+        return Checkin::where('user_id', $this->id)->whereHas('status', function($q) {$q->where('taken', 1);})->sum('duration');
     }
 
     public function socialProfile(): HasOne {

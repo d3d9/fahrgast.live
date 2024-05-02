@@ -50,7 +50,8 @@
                         >
                             <tbody>
                                 @foreach($stopovers as $stopover)
-                                    @if($stopover->isArrivalCancelled)
+                                    {{-- @if($stopover->isArrivalCancelled) --}}
+                                    @if(false)
                                         <tr>
                                             <td>{{ $stopover->station->name }}</td>
                                             <td>
@@ -65,6 +66,9 @@
                                         >
                                             <td>{{ $stopover->station->name }}</td>
                                             <td class="text-end">
+                                                @if($stopover->isArrivalCancelled)
+                                                    <span class="text-muted" style="text-decoration: line-through;">
+                                                @endif
                                                 {{ __('stationboard.arr') }}
                                                 {{ userTime($stopover->arrival_planned) }}
                                                 @isset($stopover->arrival_real)
@@ -74,6 +78,10 @@
                                                         </span>)
                                                     </small>
                                                 @endisset
+                                                @if($stopover->isArrivalCancelled)
+                                                    </span><br/>
+                                                    <span class="text-danger">{{ __('stationboard.stop-cancelled') }}</span><br/>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endif

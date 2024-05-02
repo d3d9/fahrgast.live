@@ -145,3 +145,7 @@ result*
 
 # laravel-vue-i18n
 lang/php_*.json
+
+# fahrgast.live
+worker.log
+public/latest.zip

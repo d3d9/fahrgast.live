@@ -12,6 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use JetBrains\PhpStorm\ArrayShape;
+use stdClass;
 
 /**
  * @deprecated Content will be moved to the backend/frontend/API packages soon, please don't add new functions here!
@@ -43,6 +44,50 @@ class TransportController extends Controller
                 'name'          => $station->name
             ];
         });
+    }
+
+    public static function getLocationAutocomplete(string $query): Collection {
+        $locations = HafasController::getLocations($query);
+        return $locations;
+    }
+
+    public static function locationParameters(string $location, string $base): array {
+        $parts = explode("|", $location, 4);
+        $type = $parts[0];
+        switch ($type) {
+            case "station":
+            case "stop":
+                return [$base => $parts[1]];
+            case "poi":
+                return [$base.".id" => $parts[1], $base.".latitude" => $parts[2], $base.".longitude" => $parts[3]];
+            case "address":
+                return [$base.".address" => $parts[3], $base.".latitude" => $parts[1], $base.".longitude" => $parts[2]];
+        }
+    }
+
+    public static function getJourneys(
+        string $origin,
+        string $destination,
+        ?Carbon     $when = null,
+        bool $arr = false,
+        ?string $earlierRef = null,
+        ?string $laterRef = null,
+        ?array $travelType = null,
+        int $transferTime = 0,
+        ?string $walkingSpeed = 'normal'
+    ): stdClass {
+        $journeysResponse = HafasController::getJourneys(
+            fromParameters: self::locationParameters($origin, "from"),
+            toParameters: self::locationParameters($destination, "to"),
+            when: $when ?? Carbon::now()->subMinutes(5),
+            arr: $arr,
+            earlierRef: $earlierRef,
+            laterRef: $laterRef,
+            travelType:      $travelType,
+            transferTime: $transferTime,
+            walkingSpeed: $walkingSpeed
+        );
+        return $journeysResponse;
     }
 
     /**

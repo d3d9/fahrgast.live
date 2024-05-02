@@ -105,6 +105,7 @@
                                 </div>
                             </div>
                         </form>
+                        <?php /*
                         <hr>
                         <div class="row justify-content-center">
                             <div class="col-md-8 col-lg-7">
@@ -130,6 +131,7 @@
                                 </form>
                             </div>
                         </div>
+                        */ ?>
                     </div>
                 </div>
             </div>

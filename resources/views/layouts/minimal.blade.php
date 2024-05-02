@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <title>@yield('title') | Träwelling</title>
+        <title>@yield('title') | fahrgast.live</title>
         <link href="{{ asset('fonts/Nunito/Nunito.css') }}" rel="stylesheet"/>
         @vite('resources/sass/app.scss')
         <link rel="shortcut icon" href="{{ asset('images/icons/touch-icon-vector.svg') }}"/>
@@ -12,7 +12,7 @@
             <nav class="navbar navbar-expand-md navbar-dark bg-trwl">
                 <div class="container">
                     <a class="navbar-brand" href="javascript:void(0)">
-                        Träwelling
+                        fahrgast.live
                     </a>
                 </div>
             </nav>

@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Frontend\Admin\ActivityController;
 use App\Http\Controllers\Frontend\Admin\CheckinController;
+use App\Http\Controllers\Frontend\Admin\FullExportController;
 use App\Http\Controllers\Frontend\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Frontend\Admin\StationController;
 use App\Http\Controllers\Frontend\Admin\StatusEditController;
+use App\Http\Controllers\Frontend\Admin\TravelChainEditController;
 use App\Http\Controllers\Frontend\Admin\TripController;
 use App\Http\Controllers\Frontend\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +42,19 @@ Route::middleware(['auth', 'permission:view-backend'])->group(function() {
             Route::get('/edit', [StatusEditController::class, 'renderEdit'])
                  ->name('admin.status.edit');
             Route::post('/edit', [StatusEditController::class, 'edit']);
+        });
+
+        Route::prefix('travelchain')->group(function() {
+            Route::get('/', [TravelChainEditController::class, 'renderMain'])
+                 ->name('admin.chain');
+            Route::get('/edit', [TravelChainEditController::class, 'renderEdit'])
+                 ->name('admin.chain.edit');
+            // Route::post('/edit', [TravelChainEditController::class, 'edit']);
+        });
+
+        Route::prefix('export')->group(function() {
+            Route::get('statuses', [FullExportController::class, 'generateStatusExport']);
+            Route::get('travelchains', [FullExportController::class, 'generateTravelchainExport']);
         });
 
         Route::prefix('trip')->group(function() {

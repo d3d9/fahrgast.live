@@ -1,6 +1,6 @@
 @php use App\Http\Controllers\Backend\EventController; @endphp
 @auth
-    @php($events = EventController::activeEvents())
+    {{-- @php($events = EventController::activeEvents()) --}}
     <div class="modal fade" id="checkinModal" tabindex="-1" role="dialog"
          aria-hidden="true" aria-labelledby="checkinModalTitle">
         <div class="modal-dialog" role="document">
@@ -11,6 +11,9 @@
                 </div>
                 <div class="modal-body">
                     <form action="{{ route('trains.checkin') }}" method="POST" id="checkinForm">
+
+                        @include('includes.chain-dropdown', ['id_suffix' => 'checkin'])
+
                         <div class="form-outline">
                         <textarea name="body" class="form-control" id="message-text" maxlength="280"
                                   style="min-height: 130px;"></textarea>
@@ -24,6 +27,7 @@
                         </script>
 
                         <div class="mt-2">
+                            <?php /*
                             @if (auth()->user()?->socialProfile != null)
                                 @if (auth()->user()->socialProfile->mastodon_id != null)
                                     <div class="btn-group">
@@ -51,31 +55,34 @@
                                     @endif
                                 @endif
                             @endif
-                            @include('includes.business-dropdown')
-                            @include('includes.visibility-dropdown')
+                            {{-- @include('includes.business-dropdown') --}}
+                            {{-- @include('includes.visibility-dropdown') --}}
+                            */ ?>
                         </div>
 
-                        @if($events->count() == 1)
-                            <div class="custom-control custom-checkbox mt-2">
-                                <input type="checkbox" class="custom-control-input" id="event_check" name="event"
-                                       value="{{ $events[0]->id }}"/>
-                                <label class="custom-control-label" for="event_check">
-                                    {{ __('events.on-my-way-to', ['name' => $events[0]->name]) }}
-                                </label>
-                            </div>
-                        @elseif($events->count() > 1)
-                            <div class="form-group">
-                                <label for="event-dropdown" class="col-form-label">
-                                    {{__('events.on-my-way-dropdown')}}
-                                </label>
-                                <select class="form-control" id="event-dropdown" name="event">
-                                    <option value="" selected>{{ __('events.no-event-dropdown') }}</option>
-                                    @foreach($events as $event)
-                                        <option value="{{ $event->id }}">{{ $event->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
+                        @isset($events)
+                            @if($events->count() == 1)
+                                <div class="custom-control custom-checkbox mt-2">
+                                    <input type="checkbox" class="custom-control-input" id="event_check" name="event"
+                                           value="{{ $events[0]->id }}"/>
+                                    <label class="custom-control-label" for="event_check">
+                                        {{ __('events.on-my-way-to', ['name' => $events[0]->name]) }}
+                                    </label>
+                                </div>
+                            @elseif($events->count() > 1)
+                                <div class="form-group">
+                                    <label for="event-dropdown" class="col-form-label">
+                                        {{__('events.on-my-way-dropdown')}}
+                                    </label>
+                                    <select class="form-control" id="event-dropdown" name="event">
+                                        <option value="" selected>{{ __('events.no-event-dropdown') }}</option>
+                                        @foreach($events as $event)
+                                            <option value="{{ $event->id }}">{{ $event->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+                        @endisset
 
                         <input type="hidden" id="input-tripID" name="tripID" value=""/>
                         <input type="hidden" id="input-destination" name="destination" value=""/>

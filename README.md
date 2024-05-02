@@ -1,3 +1,11 @@
+# fahrgast.live
+
+Fork von Träwelling für eine Erhebung als Teil meiner Masterarbeit.
+
+Zu den wesentlichen Ergänzungen gehören die zusammenhängende Erfassung von Fahrten in "Reiseketten" (geplanter und tatsächlicher Reiseverlauf) sowie die Möglichkeit, ganze Routenvorschläge des HAFAS in einem Rutsch anlegen zu lassen.
+
+Gleichzeitig sind viele bestehende Funktionalitäten bewusst eingeschränkt worden. Während einzelne Komponenten womöglich wiederverwendet werden können, ist der vorliegende Gesamtzustand nur mit Vorsicht zu genießen.
+
 # [Träwelling](https://traewelling.de)
 
 > Träwelling is a free check-in service that lets you tell your friends where you are and where you can log your public

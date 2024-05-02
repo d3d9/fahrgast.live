@@ -76,6 +76,5 @@
         </div>
     </div>
 
-    @include('includes.edit-modal')
-    @include('includes.delete-modal')
+    @include('includes.status-modals')
 @endsection

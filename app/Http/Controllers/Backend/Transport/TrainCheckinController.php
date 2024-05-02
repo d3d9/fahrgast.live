@@ -25,6 +25,7 @@ use App\Models\Event;
 use App\Models\Station;
 use App\Models\Status;
 use App\Models\Stopover;
+use App\Models\TravelChain;
 use App\Models\Trip;
 use App\Models\User;
 use App\Notifications\UserJoinedConnection;
@@ -58,6 +59,8 @@ abstract class TrainCheckinController extends Controller
         Carbon           $departure,
         Station          $destination,
         Carbon           $arrival,
+        TravelChain      $travelChain = null,
+        bool             $planned = null,
         Business         $travelReason = Business::PRIVATE,
         StatusVisibility $visibility = StatusVisibility::PUBLIC,
         ?string          $body = null,
@@ -75,6 +78,8 @@ abstract class TrainCheckinController extends Controller
                 user:       $user,
                 business:   $travelReason,
                 visibility: $visibility,
+                travelChain:$travelChain,
+                planned:    $planned,
                 body:       $body,
                 event:      $event
             );
@@ -169,6 +174,7 @@ abstract class TrainCheckinController extends Controller
             );
         }
 
+        /*
         $overlapping = TransportController::getOverlappingCheckIns(
             user:  $status->user,
             start: $firstStop->departure,
@@ -177,6 +183,7 @@ abstract class TrainCheckinController extends Controller
         if (!$force && $overlapping->count() > 0) {
             throw new CheckInCollisionException($overlapping->first());
         }
+        */
 
         $distance = (new LocationController($trip, $firstStop, $lastStop))->calculateDistance();
 

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use stdClass;
 
@@ -61,7 +62,7 @@ class Checkin extends Model
     protected $table    = 'train_checkins';
     protected $fillable = [
         'status_id', 'user_id', 'trip_id', 'origin', 'origin_stopover_id', 'destination', 'destination_stopover_id',
-        'distance', 'duration', 'departure', 'manual_departure', 'arrival', 'manual_arrival', 'points', 'forced',
+        'distance', 'duration', 'duration_planned', 'departure', 'manual_departure', 'arrival', 'manual_arrival', 'points', 'forced',
     ];
     protected $hidden   = ['created_at', 'updated_at'];
     protected $appends  = ['speed', 'displayDeparture', 'displayArrival'];
@@ -75,6 +76,7 @@ class Checkin extends Model
         'destination_stopover_id' => 'integer',
         'distance'                => 'integer',
         'duration'                => 'integer',
+        'duration_planned' => 'integer',
         'departure'               => UTCDateTime::class, //@deprecated -> use origin_stopover_id instead
         'manual_departure'        => UTCDateTime::class,
         'arrival'                 => UTCDateTime::class, //@deprecated -> use destination_stopover_id instead
@@ -148,7 +150,9 @@ class Checkin extends Model
                       ?? $this->departure;
         $real    = $this->originStopover?->departure_real;
         $manual  = $this->manual_departure;
-        return (object) self::prepareDisplayTime($planned, $real, $manual);
+        $result  = self::prepareDisplayTime($planned, $real, $manual);
+        $result['cancelled'] = $this->originStopover?->isDepartureCancelled;
+        return (object) $result;
     }
 
     public function getDisplayArrivalAttribute(): stdClass {
@@ -157,7 +161,27 @@ class Checkin extends Model
                       ?? $this->arrival;
         $real    = $this->destinationStopover?->arrival_real;
         $manual  = $this->manual_arrival;
-        return (object) self::prepareDisplayTime($planned, $real, $manual);
+        $result  = self::prepareDisplayTime($planned, $real, $manual);
+        $result['cancelled'] = $this->destinationStopover?->isArrivalCancelled;
+        return (object) $result;
+    }
+
+    /**
+     * Overwrite the default getter to return the cached value if available
+     * @return int
+     */
+    public function getDurationPlannedAttribute(): int {
+        //If the duration is already calculated and saved, return it
+        if (isset($this->attributes['duration_planned']) && $this->attributes['duration_planned'] !== null) {
+            return $this->attributes['duration_planned'];
+        }
+
+        //Else calculate and cache it
+        $departure = $this->originStopover->departure_planned ?? $this->departure;
+        $arrival   = $this->destinationStopover->arrival_planned ?? $this->arrival;
+        $duration_planned  = $arrival->diffInMinutes($departure);
+        DB::table('train_checkins')->where('id', $this->id)->update(['duration_planned' => $duration_planned]);
+        return $duration_planned;
     }
 
     /**
@@ -183,6 +207,7 @@ class Checkin extends Model
      * @todo Sichtbarkeit der CheckIns prüfen! Hier werden auch Private CheckIns angezeigt
      */
     public function getAlsoOnThisConnectionAttribute(): Collection {
+        return new \Illuminate\Database\Eloquent\Collection(); // FGL. Checkins sind eh alle privat, aber bei eigenen überlappenden bekommt man sich selber angezeigt
         return self::with(['status'])
                    ->where([
                                ['status_id', '<>', $this->status->id],

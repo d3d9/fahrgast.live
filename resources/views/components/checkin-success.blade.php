@@ -13,6 +13,7 @@
 
         <p>
             <span>{{ trans_choice('controller.transport.checkin-ok', preg_match('/\s/', $lineName), ['lineName' => $lineName]) }}</span>
+            <!--
             @if($pointReason === PointReason::NOT_SUFFICIENT)
                 <br/>
                 <span style="display: block;" class="text-danger mt-2">
@@ -37,6 +38,7 @@
                     {{__('no-points-message.forced')}}
                 </span>
             @endif
+            -->
         </p>
         @if($alsoOnThisConnection->count() >= 1)
             <span>{{ trans_choice('controller.transport.also-in-connection', $alsoOnThisConnection->count()) }}</span>
@@ -78,6 +80,7 @@
         @endif
         <hr>
         <p class="mb-0">
+            <!--
             <button
                     class="btn btn-outline-success btn-sm float-end trwl-share"
                     data-trwl-share-url="{{ route('status', ['id' => $id]) }}"
@@ -86,6 +89,7 @@
                 <span class="d-none d-sm-inline">{{__('menu.share')}} </span><i class="fas fa-share" aria-hidden="true"></i>
                 <span class="sr-only">{{__('menu.share')}}</span>
             </button>
+            -->
             <i class="fa fa-stopwatch d-inline"></i>&nbsp;
             <b>{!! durationToSpan(secondsToDuration($duration * 60)) !!}</b>
             —
@@ -93,10 +97,10 @@
             <b>
                 {{ number($distance / 1000) }}
                 <small>km</small>
-            </b>
+            </b><!--
             —
             <i class="fa fa-dice-d20 d-inline"></i>&nbsp;
-            <b>{{ $points }}<small>{{__('profile.points-abbr')}}</small></b>
+            <b>{{ $points }}<small>{{__('profile.points-abbr')}}</small></b>-->
         </p>
     </div>
 </div>

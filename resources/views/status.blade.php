@@ -33,8 +33,9 @@
                         <checkin-success-helper></checkin-success-helper>
                     </div>
                 @endif
-                <h2 class="fs-5">{{ userTime($status->checkin->departure,__('dateformat.with-weekday')) }}</h2>
+                <h2 class="fs-5">Fahrt am {{ userTime($status->checkin->departure,__('dateformat.with-weekday')) }}</h2>
                 @include('includes.status')
+                <!--
                 <div id="tag-helper">
                     <tag-helper
                         :status-id="{{ $status->id }}"
@@ -43,6 +44,7 @@
                         @endcan
                     ></tag-helper>
                 </div>
+                -->
 
                 @if(isset($status->checkin->trip->last_refreshed) && \Illuminate\Support\Facades\Date::now()->isBefore($status->created_at->clone()->addDay()))
                     <hr/>
@@ -54,8 +56,7 @@
             </div>
         </div>
         @if(auth()->check() && auth()->user()->id == $status->user_id)
-            @include('includes.edit-modal')
-            @include('includes.delete-modal')
+            @include('includes.status-modals')
         @endif
     </div>
 @endsection

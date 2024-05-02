@@ -19,29 +19,32 @@
         <div class="flex-center position-ref full-height">
             <div class="videoContainer">
                 <div class="overlay"></div>
+                <div style="background: black; width: 100vw; height: 100vh;"></div>
+                <?php /*
                 <video loop muted autoplay class="fullscreen-bg__video">
                     <source src="{{ asset('img/vid1.mp4') }}" type="video/mp4">
                 </video>
+                */ ?>
             </div>
             <div class="top-right links">
                 @auth
                     <a href="{{ url('/dashboard') }}">{{__('menu.dashboard')}}</a>
                 @else
                     <a href="{{ route('login') }}">{{__('menu.login')}}</a>
-                    <a href="{{ route('register') }}">{{__('menu.register')}}</a>
+                    {{-- <a href="{{ route('register') }}">{{__('menu.register')}}</a> --}}
                 @endauth
             </div>
 
             <div class="content">
-                <div class="title m-b-md">
+                <div class="title m-b-md" style="font-size: 50px;">
                     {{ config('app.name', 'Träwelling') }}
                 </div>
 
                 <div class="links">
                     <a href="{{ url('/login') }}">{{__('menu.login')}}</a>
-                    <a href="{{ url('/leaderboard') }}">{{__('menu.leaderboard')}}</a>
+                    {{-- <a href="{{ url('/leaderboard') }}">{{__('menu.leaderboard')}}</a> --}}
                     <a href="{{ route('static.about') }}">{{ __('menu.about')}}</a>
-                    <a href="{{ url('/statuses/active') }}">{{__('menu.active')}}</a>
+                    {{-- <a href="{{ url('/statuses/active') }}">{{__('menu.active')}}</a> --}}
                 </div>
             </div>
 

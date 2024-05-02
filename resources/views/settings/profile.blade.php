@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <form enctype="multipart/form-data" method="POST" action="{{ route('settings.profile') }}">
                         @csrf
-                        <div class="form-group row">
+                        <div class="form-group row" style="display: none;">
                             <label for="name" class="col-md-4 col-form-label text-md-right">
                                 {{ __('settings.picture') }}
                             </label>
@@ -117,7 +117,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
+                        <div class="form-group row" style="display: none">
                             <label for="timezone" class="col-md-4 col-form-label text-md-right">
                                 {{ __('user.timezone') }}
                             </label>
@@ -137,7 +137,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
+                        <div class="form-group row" style="display:none">
                             <label for="experimental" class="col-md-4 col-form-label text-md-right">
                                 {{ __('settings.experimental') }}
                                 <i class="fas fa-info-circle" title="{{__('settings.experimental.description')}}"

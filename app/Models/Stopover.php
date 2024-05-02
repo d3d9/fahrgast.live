@@ -89,10 +89,10 @@ class Stopover extends Model
     }
 
     public function getIsArrivalCancelledAttribute(): bool {
-        return $this->cancelled && is_null($this->arrival_platform_planned);
+        return $this->cancelled && is_null($this->arrival_platform_planned) && is_null($this->arrival_real);
     }
 
     public function getIsDepartureCancelledAttribute(): bool {
-        return $this->cancelled && is_null($this->departure_platform_planned);
+        return $this->cancelled && is_null($this->departure_platform_planned) && is_null($this->departure_real);
     }
 }

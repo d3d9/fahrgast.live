@@ -16,16 +16,16 @@
                                 <a href="{{ route('trains.stationboard', ['provider' => request()->provider, 'ibnr' => $station->ibnr, 'when' => $times['prev']->toIso8601String(), 'travelType' => request()->travelType]) }}"
                                    title="{{__('stationboard.minus-15')}}"
                                    class="btn btn-light">
-                                    <i class="fas fa-arrow-circle-left"></i>
+                                    <i class="fas fa-arrow-circle-left"></i>&emsp;Früher
                                 </a>
                                 <a href="#" id="timepicker-reveal" title="{{__('stationboard.dt-picker')}}"
-                                   class="btn btn-light btn-rounded c-datepicker-btn">
+                                   class="btn btn-light btn-rounded c-datepicker-btn" style="border-left: 1px solid lightgray;">
                                     <i class="fas fa-clock"></i>
                                 </a>
                                 <a href="{{ route('trains.stationboard', ['provider' => request()->provider, 'ibnr' => $station->ibnr, 'when' => $times['next']->toIso8601String(), 'travelType' => request()->travelType]) }}"
                                    title="{{__('stationboard.plus-15')}}"
-                                   class="btn btn-light">
-                                    <i class="fas fa-arrow-circle-right"></i>
+                                   class="btn btn-light" style="border-left: 1px solid lightgray;">
+                                    Später&emsp;<i class="fas fa-arrow-circle-right"></i>
                                 </a>
                             </div>
                         </div>
@@ -108,7 +108,7 @@
                                                 @if($departure->station->id !== $station->id && $departure->station->name !== $station->name)
                                                     data-searched-station="{{$station->id}}"
                                                 @endif
-                                                @if(!isset($departure->cancelled)) class="trainrow" @endif
+                                                @if(true /*!isset($departure->cancelled)*/) class="trainrow" @endif
                                             >
                                                 <td class="ps-2 ps-md-4">
                                                     @if($departure->delay === null)

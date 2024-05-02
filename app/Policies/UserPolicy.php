@@ -35,11 +35,13 @@ class UserPolicy
      */
     public function view(?User $user, User $model): Response {
         if ($user === null) {
-            return $model->private_profile ? Response::deny(__('profile.private-profile-text')) : Response::allow();
+            return Response::deny();
+            // return $model->private_profile ? Response::deny(__('profile.private-profile-text')) : Response::allow();
         }
         if ($user->is($model)) {
             return Response::allow();
         }
+        /*
         if ($model->private_profile && !$model->followers->contains('user_id', $user->id)) {
             return Response::deny(__('profile.private-profile-text'));
         }
@@ -51,8 +53,8 @@ class UserPolicy
         }
         if (BlockController::isBlocked($user, $model)) {
             return Response::deny(__('profile.youre-blocked-text'));
-        }
-        return Response::allow();
+        }*/
+        return Response::deny();
     }
 
     /**

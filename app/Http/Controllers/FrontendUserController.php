@@ -23,6 +23,13 @@ class FrontendUserController extends Controller
 {
     public function getProfilePage(string $username): View {
         $user = User::where('username', $username)->firstOrFail();
+
+        try {
+            $this->authorize('view', $user);
+        } catch (AuthorizationException) {
+            abort(403, __('error.status.not-authorized'));
+        }
+
         try {
             $statuses = UserController::statusesForUser($user);
         } catch (AuthorizationException) {

@@ -16,7 +16,7 @@
 @section('content')
     <div class="px-md-4 py-md-5 py-4 mt-n4 profile-banner">
         <div class="container">
-            <img alt="{{ __('settings.picture') }}"
+            <img alt="{{ __('settings.picture') }}" style="display: none;"
                  src="{{ \App\Http\Controllers\Backend\User\ProfilePictureController::getUrl($user) }}"
                  class="float-end img-thumbnail rounded-circle img-fluid profile-picture"/>
             <div class="text-white px-md-4">
@@ -44,12 +44,14 @@
                             <span class="font-weight-bold"><i class="fa fa-route d-inline"></i>&nbsp;{{ number($user->train_distance / 1000) }}</span><span
                                 class="small font-weight-lighter">km</span>
                             <span class="font-weight-bold ps-sm-2"><i class="fa fa-stopwatch d-inline"></i>&nbsp;{!! durationToSpan(secondsToDuration($user->train_duration * 60)) !!}</span>
+                            <!--
                             <span class="font-weight-bold ps-sm-2">
                                 <i class="fa fa-dice-d20 d-inline"></i>&nbsp;{{ $user->points }}
                             </span>
                             <span class="small font-weight-lighter">
                                 {{__('profile.points-abbr')}}
                             </span>
+                            -->
                         @if($user->mastodonUrl)
                             <span class="font-weight-bold ps-sm-2">
                                 <a href="{{ $user->mastodonUrl }}" rel="me" class="text-white" target="_blank">
@@ -117,7 +119,6 @@
             @endif
         </div>
 
-        @include('includes.edit-modal')
-        @include('includes.delete-modal')
+        @include('includes.status-modals')
     </div>
 @endsection

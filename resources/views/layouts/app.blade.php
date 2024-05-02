@@ -50,7 +50,7 @@
 
                     <div class="navbar-toggler">
                         @auth
-                            <notification-bell></notification-bell>
+                            <!-- <notification-bell></notification-bell> -->
                         @endauth
                         <button class="navbar-toggler" type="button" data-mdb-toggle="collapse"
                                 data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -61,11 +61,12 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto">
                             @auth
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->is('dashboard/*') ? 'active' : '' }}"
+                                <li class="nav-item">{{-- FGLTODO-LP: dashboard ist in trwl nicht active, PR machen? --}}
+                                    <a class="nav-link {{ request()->is('dashboard', 'dashboard/*') ? 'active' : '' }}"
                                        href="{{ route('dashboard') }}">{{ __('menu.dashboard') }}</a>
                                 </li>
                             @endauth
+                            <?php /*
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('leaderboard') ? 'active' : '' }}"
                                    href="{{ route('leaderboard') }}">{{ __('menu.leaderboard') }}</a>
@@ -74,13 +75,15 @@
                                 <a class="nav-link {{ request()->is('statuses/active') ? 'active' : '' }}"
                                    href="{{ route('statuses.active') }}">{{ __('menu.active') }}</a>
                             </li>
+                            */ ?>
                             @auth
+                                <?php /*
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->is('stats') ? 'active' : '' }}"
                                        href="{{ route('stats') }}">
                                         {{__('stats')}}
                                     </a>
-                                </li>
+                                </li> */ ?>
                                 @if(config('trwl.year_in_review.alert'))
                                     <li class="nav-item">
                                         <a class="nav-link" href="/your-year/">
@@ -96,10 +99,13 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('menu.login') }}</a>
                                 </li>
+                                <?php /*
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('menu.register') }}</a>
                                 </li>
+                                */ ?>
                             @else
+                                <?php /*
                                 <form class="form-inline" action="{{ route('userSearch') }}">
                                     <div class="input-group md-form form-sm form-2 ps-0 m-0">
                                         <input name="searchQuery" type="text"
@@ -114,8 +120,9 @@
                                         </button>
                                     </div>
                                 </form>
+                                */ ?>
                                 <li class="nav-item d-none d-md-inline-block">
-                                    <notification-bell :link="true"></notification-bell>
+                                    <!-- <notification-bell :link="true"></notification-bell> -->
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a id="navbarDropdown" href="#" class="nav-link dropdown-toggle mdb-select"
@@ -132,11 +139,13 @@
                                                 <i class="fas fa-user"></i> {{ __('menu.profile') }}
                                             </a>
                                         </li>
+                                        <!--
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('export') }}">
+                                            <a class="dropdown-item" href="{{-- route('export') --}}">
                                                 <i class="fas fa-save"></i> {{ __('menu.export') }}
                                             </a>
                                         </li>
+                                        -->
                                         <li>
                                             <a class="dropdown-item" href="{{ route('settings') }}">
                                                 <i class="fas fa-cog"></i> {{ __('menu.settings') }}
@@ -145,7 +154,7 @@
                                         @if(config('ticket.host') !== null)
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('static.about') }}">
-                                                    <i class="fa-solid fa-bug" aria-hidden="true"></i>
+                                                    <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
                                                     {{ __('help') }}
                                                 </a>
                                             </li>
@@ -187,9 +196,10 @@
 
             <footer class="py-5">
                 <div class="container">
-                    <div class="row">
-                        <div class="col-6 col-md-2 mb-3">
+                    <div class="row" style="align-items: center;">
+                        <div class="col-6 col-md-auto mb-2 mb-md-0">
                             <ul class="nav flex-column">
+                                <?php /*
                                 <li class="nav-item mb-2">
                                     <a href="{{ route('globaldashboard') }}" class="nav-link p-0 text-body-secondary">
                                         {{ __('menu.globaldashboard') }}
@@ -200,7 +210,8 @@
                                         {{ __('events') }}
                                     </a>
                                 </li>
-                                <li class="nav-item mb-2">
+                                */ ?>
+                                <li class="nav-item">
                                     <a href="{{ route('static.about') }}" class="nav-link p-0 text-body-secondary">
                                         {{ __('menu.about') }}
                                     </a>
@@ -208,22 +219,26 @@
                             </ul>
                         </div>
 
-                        <div class="col-6 col-md-2 mb-3">
+                        <div class="col-6 col-md-auto mb-2 mb-md-0">
                             <ul class="nav flex-column">
-                                <li class="nav-item mb-2">
+                                <li class="nav-item">
                                     <a href="{{ route('legal.privacy') }}" class="nav-link p-0 text-body-secondary">
                                         {{ __('menu.privacy') }}
                                     </a>
                                 </li>
-                                <li class="nav-item mb-2">
+
+                            </ul>
+                        </div>
+
+                        <div class="col-6 col-md-auto mb-2 mb-md-0">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
                                     <a href="{{ route('legal.notice') }}" class="nav-link p-0 text-body-secondary">
                                         {{ __('menu.legal-notice') }}
                                     </a>
                                 </li>
                             </ul>
-                        </div>
-
-                        <div class="col-6 col-md-2 mb-3">
+                            <?php /*
                             <ul class="nav flex-column">
                                 <li class="nav-item mb-2">
                                     <a href="https://blog.traewelling.de"
@@ -241,10 +256,12 @@
                                     </a>
                                 </li>
                             </ul>
+                            */ ?>
                         </div>
 
-                        <div class="col-md-auto ms-md-auto mb-3">
+                        <div class="col-md-auto ms-md-auto">
                             <ul class="nav flex-column">
+                                <!--
                                 <li class="nav item mb-2">
                                     <div class="btn-group dropup w-100">
                                         <button type="button" class="btn btn-primary btn-block dropdown-toggle"
@@ -262,7 +279,8 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li class="nav item mb-2">
+                                -->
+                                <li class="nav item">
                                     <div class="btn-group dropup w-100">
                                         <button type="button" class="btn btn-primary btn-block dropdown-toggle"
                                                 data-mdb-dropdown-animation="off"
@@ -287,13 +305,13 @@
                     </div>
 
                     <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
-                        <p class="mb-0">&copy; {{date('Y')}} Tr&auml;welling</p>
+                        <p class="mb-0">&copy; {{date('Y')}} fahrgast.live, Tr&auml;welling</p>
                         <p class="mb-0">{!! __('menu.developed') !!}</p>
                         <p class="mb-0 text-muted small">
                             Version
-                            <a href="{{route('changelog')}}">
+                            {{-- <a href="{{route('changelog')}}"> --}}
                                 {{ \App\Http\Controllers\Backend\VersionController::getVersion() }}
-                            </a>
+                            {{-- </a> --}}
                         </p>
                     </div>
             </footer>
@@ -315,10 +333,10 @@
              * checkin into components/stationboard.js.
              */
             var token            = '{{ csrf_token() }}';
-            var urlFollow        = '{{ route('follow.create') }}';
-            var urlFollowRequest = '{{ route('follow.request') }}';
+            var urlFollow        = '{{-- route('follow.create') --}}';
+            var urlFollowRequest = '{{-- route('follow.request') --}}';
             var urlTrainTrip     = '{{ route('trains.trip') }}';
-            var urlUnfollow      = '{{ route('follow.destroy') }}';
+            var urlUnfollow      = '{{-- route('follow.destroy') --}}';
             var urlAutocomplete  = '{{ url('transport/train/autocomplete') }}';
             var mapprovider      = '{{ Auth::user()->mapprovider ?? "default" }}';
 
